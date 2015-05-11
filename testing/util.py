@@ -8,7 +8,7 @@ from distlib.wheel import IMPVER
 
 
 def is_py2_or_pypy():
-    return str is not bytes or '__pypy__' in sys.builtin_module_names
+    return str is bytes or '__pypy__' in sys.builtin_module_names
 
 
 def expected_wheel_name(fmt):
