@@ -8,7 +8,7 @@ pip+wheel wrapper which allows you to choose a custom platform name for
 building, downloading, and installing wheels.
 
 This package assumes you're running your own pypi server and would like
-support for wheels on named platforms what would otherwise be considered
+support for wheels on named platforms that would otherwise be considered
 equivalent by the wheel infrastructure (for example not all linux_x86_64 are
 created equal).
 
