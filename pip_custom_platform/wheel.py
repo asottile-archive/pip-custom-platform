@@ -5,8 +5,6 @@ from __future__ import unicode_literals
 
 import os
 import shutil
-import subprocess
-import sys
 
 from distlib.wheel import Wheel
 
@@ -20,12 +18,10 @@ def wheel(platform_name, wheel_dir, pip_args):
     # Do this in a tempdir in case there are already wheels in the output
     # directory
     with tmpdir() as tempdir:
-        subprocess.check_call(
-            (
-                sys.executable, '-m', 'pip.__main__', 'wheel',
-                '--wheel-dir', tempdir,
-            ) + tuple(pip_args),
-        )
+        import pip
+        ret = pip.main(['wheel', '--wheel-dir', tempdir] + list(pip_args))
+        if ret:
+            return ret
 
         # Then rename any of the platform-specific wheels created
         for wheel_filename in os.listdir(tempdir):

@@ -11,20 +11,23 @@ def add_shared_arguments(parser):
     parser.add_argument(
         '--platform', help='Custom platform name (required).', required=True,
     )
-    parser.add_argument(
-        'pip_args', nargs='*', help='See pip <command> for other arguments.',
-    )
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description=(
+            'pip+wheel wrapper which allows you to choose a custom platform '
+            'name for building, downloading, and installing wheels.\n\n'
+            'Any unparsed command arguments will be passed on to pip\n'
+        ),
+    )
     subparsers = parser.add_subparsers(dest='command')
 
-    install_parser = subparsers.add_parser('install', help='Install packages')
-    add_shared_arguments(install_parser)
-    install_parser.add_argument(
-        '-d', '--download', help='Download packages instead of installing',
+    install_parser = subparsers.add_parser(
+        'install', help='Install packages',
+        usage='derp',
     )
+    add_shared_arguments(install_parser)
 
     wheel_parser = subparsers.add_parser('wheel', help='Build wheels')
     add_shared_arguments(wheel_parser)
@@ -33,12 +36,14 @@ def main(argv=None):
         default='./wheelhouse',
     )
 
-    args = parser.parse_args(argv)
+    args, argv = parser.parse_known_args(argv)
 
-    if args.command == 'install':  # pragma: no cover (TODO)
-        return install(args.platform, args.pip_args, download=args.download)
+    platform = args.platform.replace('-', '_')
+
+    if args.command == 'install':
+        return install(platform, argv)
     elif args.command == 'wheel':
-        return wheel(args.platform, args.wheel_dir, args.pip_args)
+        return wheel(platform, args.wheel_dir, argv)
     else:
         raise NotImplementedError('{0} not implemented'.format(args.command))
 
