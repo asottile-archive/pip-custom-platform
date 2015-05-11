@@ -25,10 +25,13 @@ setup(
     packages=find_packages('.', exclude=('tests*', 'testing*')),
     install_requires=[
         'argparse',
+        'distlib',
         'pip',
         'wheel',
     ],
     entry_points={
-        'console_scripts': [],
+        'console_scripts': [
+            'pip-custom-platform = pip_custom_platform.main:main',
+        ],
     },
 )
