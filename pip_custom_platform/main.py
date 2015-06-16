@@ -23,10 +23,7 @@ def main(argv=None):
     )
     subparsers = parser.add_subparsers(dest='command')
 
-    install_parser = subparsers.add_parser(
-        'install', help='Install packages',
-        usage='derp',
-    )
+    install_parser = subparsers.add_parser('install', help='Install packages')
     add_shared_arguments(install_parser)
 
     wheel_parser = subparsers.add_parser('wheel', help='Build wheels')
