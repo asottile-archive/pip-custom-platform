@@ -4,12 +4,16 @@ from __future__ import unicode_literals
 import argparse
 
 from pip_custom_platform.install import install
+from pip_custom_platform.util import default_platform_name
 from pip_custom_platform.wheel import wheel
 
 
 def add_shared_arguments(parser):
+    default_platform = default_platform_name()
     parser.add_argument(
-        '--platform', help='Custom platform name (required).', required=True,
+        '--platform',
+        default=default_platform,
+        help='Custom platform name (default: {0})'.format(default_platform),
     )
 
 

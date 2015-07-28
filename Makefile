@@ -12,6 +12,10 @@ tests: test
 test: .venv.touch
 	tox $(REBUILD_FLAG)
 
+.PHONY: docker-tests
+docker-tests: .venv.touch
+	$(eval REBUILD_FLAG := -- tests --docker)
+	tox $(REBUILD_FLAG)
 
 .venv.touch: setup.py requirements-dev.txt
 	$(eval REBUILD_FLAG := --recreate)
