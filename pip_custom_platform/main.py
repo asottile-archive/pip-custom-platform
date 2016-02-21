@@ -26,6 +26,7 @@ def main(argv=None):
         ),
     )
     subparsers = parser.add_subparsers(dest='command')
+    subparsers.required = True
 
     install_parser = subparsers.add_parser('install', help='Install packages')
     add_shared_arguments(install_parser)
