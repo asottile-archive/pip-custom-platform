@@ -21,10 +21,9 @@ docker-tests: .venv.touch
 	$(eval REBUILD_FLAG := --recreate)
 	touch .venv.touch
 
-
 .PHONY: clean
 clean:
-	find . -iname '*.pyc' -delete
+	find -name '*.pyc' -delete
 	rm -rf .tox
 	rm -rf ./venv-*
 	rm -f .venv.touch
