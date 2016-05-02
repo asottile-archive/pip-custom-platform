@@ -22,13 +22,13 @@ setup(
         'Programming Language :: Python :: Implementation :: CPython',
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
-    packages=find_packages('.', exclude=('tests*', 'testing*')),
+    packages=find_packages(exclude=('tests*', 'testing*')),
     install_requires=[
-        'argparse',
         'distlib',
         'pip',
         'wheel',
     ],
+    extras_require={':python_version=="2.6"': ['argparse']},
     entry_points={
         'console_scripts': [
             'pip-custom-platform = pip_custom_platform.main:main',
