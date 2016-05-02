@@ -33,6 +33,14 @@ def wheel(plat, wheeldir, pkg, *args):
     call('wheel', '--platform', plat, '--wheel-dir', wheeldir, pkg, *args)
 
 
+def test_useful_message_with_no_args():
+    """We should print a useful message when called with no arguments."""
+    with pytest.raises(CalledProcessError) as ex:
+        call()
+    _, _, stderr = ex.value.args
+    assert b'usage: main.py' in stderr
+
+
 def test_pure_python_package(tmpdir):
     wheeldir = tmpdir.join('wheelhouse').strpath
     wheel('plat', wheeldir, 'testing/pure_py_project')
