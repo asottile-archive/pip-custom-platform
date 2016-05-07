@@ -14,7 +14,6 @@ setup(
     classifiers=[
         'License :: OSI Approved :: MIT License',
         'Programming Language :: Python :: 2',
-        'Programming Language :: Python :: 2.6',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
         'Programming Language :: Python :: 3.3',
@@ -23,15 +22,14 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
     packages=find_packages(exclude=('tests*', 'testing*')),
-    install_requires=[
-        'distlib',
-        'pip',
-        'wheel',
-    ],
-    extras_require={':python_version=="2.6"': ['argparse']},
+    install_requires=['pip', 'wheel', 'pymonkey>=0.2.0'],
     entry_points={
         'console_scripts': [
             'pip-custom-platform = pip_custom_platform.main:main',
+        ],
+        'pymonkey': ['pip-custom-platform = pip_custom_platform.pymonkey'],
+        'pymonkey.argparse': [
+            'pip-custom-platform = pip_custom_platform.pymonkey',
         ],
     },
 )

@@ -12,14 +12,14 @@ def test_project_with_c(tmpdir):
     subprocess.check_call(('virtualenv', venv.strpath))
     subprocess.check_call((
         'sh', '-c',
-        '. {0}/bin/activate && pip install testing/project_with_c'.format(
+        '. {}/bin/activate && pip install testing/project_with_c'.format(
             venv.strpath,
         ),
     ))
     proc = subprocess.Popen(
         (
             'sh', '-c',
-            '. {0}/bin/activate && '
+            '. {}/bin/activate && '
             'python -c "'
             'import project_with_c\n'
             'print(project_with_c.hello_world())"'.format(

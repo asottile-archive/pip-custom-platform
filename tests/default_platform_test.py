@@ -1,18 +1,22 @@
 from __future__ import print_function
+from __future__ import unicode_literals
 
-import sys
-from collections import namedtuple
-from os.path import dirname
-from os.path import realpath
-from subprocess import PIPE
-from subprocess import Popen
+import collections
+import distutils.util
+import functools
+import os.path
+import subprocess
 
-import distlib.wheel
 import mock
 import pytest
 
-import pip_custom_platform
-from pip_custom_platform.util import default_platform_name
+from pip_custom_platform.default_platform import _default_platform_name
+from pip_custom_platform.default_platform import _sanitize_platform
+
+
+default_platform_name = functools.partial(
+    _default_platform_name, distutils.util.get_platform,
+)
 
 
 SETUP_DEBIAN = (
@@ -25,12 +29,12 @@ SETUP_NO_PIP_PACKAGE = (
     'curl "https://bootstrap.pypa.io/get-pip.py" | python >&2',
 )
 
-SystemTestCase = namedtuple('SystemTestCase', [
+SystemTestCase = collections.namedtuple('SystemTestCase', (
     'docker_image',
     'mock_linux_dist',
     'expected_platform_name',
     'setup_script',
-])
+))
 
 SYSTEM_TESTCASES = [
     SystemTestCase(
@@ -55,9 +59,7 @@ SYSTEM_TESTCASES = [
         docker_image='fedora:22',
         mock_linux_dist=('Fedora', '22', 'Twenty Two'),
         expected_platform_name='linux_fedora_22_x86_64',
-        setup_script=(
-            'yum install -y python-pip >&2',
-        )
+        setup_script=('yum install -y python-pip >&2',),
     ),
     SystemTestCase(
         docker_image='rhel7',
@@ -86,7 +88,7 @@ SYSTEM_TESTCASES = [
 
 
 @pytest.mark.parametrize('case', SYSTEM_TESTCASES)
-@mock.patch('pip_custom_platform.util.platform')
+@mock.patch('pip_custom_platform.default_platform.platform')
 def test_platform_linux(mock_platform, case):
     mock_platform.system.return_value = 'Linux'
     mock_platform.machine.return_value = 'x86_64'
@@ -94,10 +96,18 @@ def test_platform_linux(mock_platform, case):
     assert default_platform_name() == case.expected_platform_name
 
 
-@mock.patch('pip_custom_platform.util.platform')
+@mock.patch('pip_custom_platform.default_platform.platform')
 def test_platform_notlinux(mock_platform):
     mock_platform.system.return_value = "it's a unix system!"
-    assert default_platform_name() == distlib.wheel.ARCH
+    ret = default_platform_name()
+    assert ret == _sanitize_platform(distutils.util.get_platform())
+
+
+PLATFORM_SCRIPT = '''\
+from distutils.util import get_platform
+from pip_custom_platform.default_platform import _default_platform_name
+print(_default_platform_name(get_platform))
+'''
 
 
 @pytest.mark.skipif(
@@ -117,7 +127,7 @@ class TestDistributionNameDockerIntegration(object):  # pragma: no cover
         """Ensure the default_platform_name() output matches what we expect."""
         commands = case.setup_script + (
             'pip install /mnt >&2',
-            'python -c "from pip_custom_platform.util import default_platform_name\nprint(default_platform_name())"',  # noqa
+            'python -c "{}"'.format(PLATFORM_SCRIPT)
         )
         stdout = run_in_docker(case.docker_image, commands)
         assert stdout.strip() == case.expected_platform_name
@@ -139,14 +149,13 @@ def run_in_docker(image, commands):  # pragma: no cover
     :param image: a Docker image and tag (e.g. 'debian:jessie')
     :param commands: list of commands to paste to the shell
     """
-    repo_dir = dirname(dirname(realpath(pip_custom_platform.__file__)))
-    mount_option = '{0}:/mnt:ro'.format(repo_dir)
+    repo_dir = os.path.abspath(os.path.join(__file__, '../../'))
+    mount_option = '{}:/mnt:ro'.format(repo_dir)
 
     cmd = ('docker', 'run', '-v', mount_option, '-i', image, 'sh')
-    proc = Popen(cmd, stdin=PIPE, stdout=PIPE)
+    proc = subprocess.Popen(
+        cmd, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+    )
 
     lines = '\n'.join(commands)
-    if sys.version_info < (3,):
-        return proc.communicate(lines)[0]
-    else:
-        return proc.communicate(lines.encode('utf-8'))[0].decode('utf-8')
+    return proc.communicate(lines.encode('utf-8'))[0].decode('utf-8')
