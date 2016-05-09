@@ -5,6 +5,7 @@ import os.path
 import subprocess
 import sys
 
+import mock
 import pytest
 
 from testing.util import expected_wheel_name
@@ -163,3 +164,13 @@ def test_download_wrong_plat_falls_back_to_sdist(tmpdir):
     )
 
     assert os.listdir(download_dest.strpath) == ['project_with_c-0.1.0.tar.gz']
+
+
+def test_show_platform_name_custom_platform(capfd):
+    call('show-platform-name', '--platform', 'herp-derp')
+    assert capfd.readouterr() == ('herp_derp\n', '')
+
+
+def test_show_platform_name_default(capfd):
+    call('show-platform-name')
+    assert capfd.readouterr() == (mock.ANY, '')
