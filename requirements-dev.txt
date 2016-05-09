@@ -1,4 +1,5 @@
 -e .
+-e testing/uses_pip
 astroid<1.3.3
 coverage
 flake8
