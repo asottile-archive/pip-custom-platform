@@ -11,13 +11,14 @@ import pytest
 from testing.util import expected_wheel_name
 
 
-def call(*cmd):
+def call_coverage(*cmd):
     subprocess.check_call(
-        (
-            sys.executable, '-m', 'coverage.__main__', 'run', '-p',
-            '-m', 'pip_custom_platform.main',
-        ) + cmd,
+        (sys.executable, '-m', 'coverage', 'run', '-p') + cmd
     )
+
+
+def call(*cmd):
+    call_coverage('-m', 'pip_custom_platform.main', *cmd)
 
 
 def wheel(plat, wheeldir, pkg, *args):
@@ -29,7 +30,7 @@ def test_useful_message_with_no_args(capfd):
     with pytest.raises(subprocess.CalledProcessError):
         call()
     _, err = capfd.readouterr()
-    assert 'usage: main.py' in err
+    assert 'usage: pip-custom-platform' in err
 
 
 def test_pure_python_package(tmpdir):
@@ -113,41 +114,33 @@ def test_default_platform(tmpdir):
 
 def test_download_falls_back_to_sdist(tmpdir):
     findlinks_dir = tmpdir.join('findlinks_dir').strpath
-    download_dest = tmpdir.join('downloads')
-    download_dest.mkdir()
+    download_dest = tmpdir.join('downloads').mkdir().strpath
 
     # Build an sdist
     subprocess.check_call(
-        (
-            sys.executable, 'setup.py', 'sdist',
-            '--dist-dir', findlinks_dir,
-        ),
+        (sys.executable, 'setup.py', 'sdist', '--dist-dir', findlinks_dir),
         cwd='testing/project_with_c',
     )
 
     call(
         'install',
         '--platform', 'plat1',
-        '--download', download_dest.strpath,
+        '--download', download_dest,
         '--find-links', 'file://{}'.format(findlinks_dir),
         '--no-index',
         'project_with_c',
     )
 
-    assert os.listdir(download_dest.strpath) == ['project_with_c-0.1.0.tar.gz']
+    assert os.listdir(download_dest) == ['project_with_c-0.1.0.tar.gz']
 
 
 def test_download_wrong_plat_falls_back_to_sdist(tmpdir):
     findlinks_dir = tmpdir.join('findlinks_dir').strpath
-    download_dest = tmpdir.join('downloads')
-    download_dest.mkdir()
+    download_dest = tmpdir.join('downloads').mkdir().strpath
 
     # Build an sdist
     subprocess.check_call(
-        (
-            sys.executable, 'setup.py', 'sdist',
-            '--dist-dir', findlinks_dir,
-        ),
+        (sys.executable, 'setup.py', 'sdist', '--dist-dir', findlinks_dir),
         cwd='testing/project_with_c',
     )
 
@@ -157,13 +150,13 @@ def test_download_wrong_plat_falls_back_to_sdist(tmpdir):
     call(
         'install',
         '--platform', 'plat1',
-        '--download', download_dest.strpath,
+        '--download', download_dest,
         '--find-links', 'file://{}'.format(findlinks_dir),
         '--no-index',
         'project_with_c',
     )
 
-    assert os.listdir(download_dest.strpath) == ['project_with_c-0.1.0.tar.gz']
+    assert os.listdir(download_dest) == ['project_with_c-0.1.0.tar.gz']
 
 
 def test_show_platform_name_custom_platform(capfd):
@@ -174,3 +167,18 @@ def test_show_platform_name_custom_platform(capfd):
 def test_show_platform_name_default(capfd):
     call('show-platform-name')
     assert capfd.readouterr() == (mock.ANY, '')
+
+
+def test_pymonkey_patch(tmpdir):
+    findlinks_dir = tmpdir.join('findlinks_dir').strpath
+    download_dest = tmpdir.join('downloads').mkdir().strpath
+
+    call_coverage(
+        '-m', 'pymonkey', 'pip-custom-platform', '--', 'uses-pip',
+        '--platform', 'plat1',
+        findlinks_dir, download_dest,
+        'testing/project_with_c', 'project-with-c',
+    )
+    assert os.listdir(download_dest) == [
+        expected_wheel_name('project_with_c-0.1.0-{}-{}-plat1.whl'),
+    ]
