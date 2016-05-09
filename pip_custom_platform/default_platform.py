@@ -60,3 +60,10 @@ def get_platform_func(args, distutils_util_get_platform):
     else:
         platform_name = _default_platform_name(distutils_util_get_platform)
     return lambda: platform_name
+
+
+def get_platform_main():
+    def main():
+        import distutils.util
+        print(distutils.util.get_platform())
+    return main

@@ -1,8 +1,10 @@
 def pymonkey_argparse(argv):
     def _add_platform_param(parser):
         parser.add_argument(
-            '--platform',
-            help='Custom platform name (default is auto-detected)',
+            '--platform', help=(
+                'Custom platform name.  The default is auto-detected -- '
+                'Use `pip-custom-platform show-platform-name` to show.'
+            ),
         )
 
     import argparse
@@ -21,6 +23,11 @@ def pymonkey_argparse(argv):
 
     download = subparsers.add_parser('download', help='Download packages')
     _add_platform_param(download)
+
+    platform_name = subparsers.add_parser(
+        'show-platform-name', help='Show the default platform name',
+    )
+    _add_platform_param(platform_name)
 
     wheel = subparsers.add_parser('wheel', help='Build wheels')
     _add_platform_param(wheel)
@@ -43,3 +50,6 @@ def pymonkey_patch(mod, args):
     elif mod.__name__ == 'pip' and args.command == 'wheel':
         from pip_custom_platform.wheel import get_wheel_main
         mod.main = get_wheel_main(mod.main, args)
+    elif mod.__name__ == 'pip' and args.command == 'show-platform-name':
+        from pip_custom_platform.default_platform import get_platform_main
+        mod.main = get_platform_main()
