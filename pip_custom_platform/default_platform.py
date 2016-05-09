@@ -1,25 +1,21 @@
 from __future__ import absolute_import
 from __future__ import unicode_literals
 
-import contextlib
-import os
 import platform
 import re
-import shutil
-import tempfile
-
-import distlib.wheel
 
 
-def default_platform_name():
+def _sanitize_platform(platform_name):
+    """Platform names must only be alphanumeric with underscores"""
+    return re.sub('[^a-z0-9_]', '_', platform_name.lower())
+
+
+def _default_platform_name(distutils_util_get_platform):
     """Guess a sane default platform name.
 
     On OS X and Windows, just uses the default platform name. On Linux, uses
     information from the `platform` module to try to make something reasonable.
     """
-    def sanitize(string):
-        return re.sub('[^a-z0-9_]', '_', string.lower())
-
     def grab_version(string, num):
         """Grab the `num` most significant components of a version string.
 
@@ -48,33 +44,19 @@ def default_platform_name():
 
         if release:
             return 'linux_{dist}_{release}_{arch}'.format(
-                dist=sanitize(dist),
-                release=sanitize(release),
-                arch=sanitize(platform.machine()),
+                dist=_sanitize_platform(dist),
+                release=_sanitize_platform(release),
+                arch=_sanitize_platform(platform.machine()),
             )
 
     # For Windows, OS X, or Linux distributions we couldn't identify, just fall
     # back to whatever pip normally uses.
-    return distlib.wheel.ARCH
+    return _sanitize_platform(distutils_util_get_platform())
 
 
-@contextlib.contextmanager
-def tmpdir():
-    """Contextmanager to create a temporary directory.  It will be cleaned up
-    afterwards.
-    """
-    tempdir = tempfile.mkdtemp()
-    try:
-        yield tempdir
-    finally:
-        shutil.rmtree(tempdir)
-
-
-def mkdirp(path):
-    try:
-        os.makedirs(path)
-    except OSError:
-        if os.path.isdir(path):
-            return
-        else:
-            raise
+def get_platform_func(args, distutils_util_get_platform):
+    if args.platform:
+        platform_name = _sanitize_platform(args.platform)
+    else:
+        platform_name = _default_platform_name(distutils_util_get_platform)
+    return lambda: platform_name
