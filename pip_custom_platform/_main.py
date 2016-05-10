@@ -14,9 +14,6 @@ import tempfile
 
 @contextlib.contextmanager
 def tmpdir():
-    """Contextmanager to create a temporary directory.  It will be cleaned up
-    afterwards.
-    """
     tempdir = tempfile.mkdtemp()
     try:
         yield tempdir
@@ -28,9 +25,7 @@ def mkdirp(path):
     try:
         os.makedirs(path)
     except OSError:
-        if os.path.isdir(path):
-            return
-        else:
+        if not os.path.isdir(path):
             raise
 
 
@@ -41,7 +36,7 @@ def _wheel(wheel_dir, pip_main, pip_args):
     # Do this in a tempdir in case there are already wheels in the output
     # directory
     with tmpdir() as tempdir:
-        ret = pip_main(['wheel', '--wheel-dir', tempdir] + list(pip_args))
+        ret = pip_main(['wheel', '--wheel-dir', tempdir] + pip_args)
         if ret:
             return ret
 
