@@ -5,7 +5,6 @@ import os.path
 import subprocess
 import sys
 
-import mock
 import pytest
 
 from testing.util import expected_wheel_name
@@ -166,7 +165,9 @@ def test_show_platform_name_custom_platform(capfd):
 
 def test_show_platform_name_default(capfd):
     call('show-platform-name')
-    assert capfd.readouterr() == (mock.ANY, '')
+    out, err = capfd.readouterr()
+    assert out
+    assert err == ''
 
 
 def test_pymonkey_patch(tmpdir):
@@ -182,3 +183,10 @@ def test_pymonkey_patch(tmpdir):
     assert os.listdir(download_dest) == [
         expected_wheel_name('project_with_c-0.1.0-{}-{}-plat1.whl'),
     ]
+
+
+def test_ok_with_unknown_pip_commands(capfd):
+    call('help')
+    out, err = capfd.readouterr()
+    assert out
+    assert err == ''

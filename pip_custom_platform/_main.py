@@ -11,6 +11,8 @@ import shutil
 import sys
 import tempfile
 
+from pip.commands import get_summaries
+
 
 @contextlib.contextmanager
 def tmpdir():
@@ -84,31 +86,26 @@ def get_main(pip_main):
         subparsers = parser.add_subparsers(dest='command')
         subparsers.required = True
 
-        install = subparsers.add_parser('install', help='Install packages')
-        _add_platform_param(install)
-
-        download = subparsers.add_parser('download', help='Download packages')
-        _add_platform_param(download)
+        for cmd, summary in get_summaries():
+            subparser = subparsers.add_parser(cmd, help=summary)
+            if cmd in ('install', 'download', 'wheel'):
+                _add_platform_param(subparser)
+            if cmd == 'wheel':
+                subparser.add_argument(
+                    '-w', '--wheel-dir', default='./wheelhouse',
+                    help='Build wheels into this directory',
+                )
 
         platform_name = subparsers.add_parser(
             'show-platform-name', help='Show the default platform name',
         )
         _add_platform_param(platform_name)
 
-        wheel = subparsers.add_parser('wheel', help='Build wheels')
-        _add_platform_param(wheel)
-        wheel.add_argument(
-            '-w', '--wheel-dir', help='Build wheels into this directory',
-            default='./wheelhouse',
-        )
-
         args, rest = parser.parse_known_args(argv)
-        if args.command in ('install', 'download'):
-            return pip_main([args.command] + rest)
-        elif args.command == 'wheel':
+        if args.command == 'wheel':
             return _wheel(args.wheel_dir, pip_main, rest)
         elif args.command == 'show-platform-name':
             return _show_platform_name()
         else:
-            raise NotImplementedError(args.command)
+            return pip_main([args.command] + rest)
     return main
