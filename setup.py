@@ -8,7 +8,7 @@ setup(
         'name for building, downloading, and installing wheels.'
     ),
     url='https://github.com/asottile/pip-custom-platform',
-    version='0.3.0',
+    version='0.3.1',
     author='Anthony Sottile',
     author_email='asottile@umich.edu',
     classifiers=[
@@ -22,7 +22,7 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
     packages=find_packages(exclude=('tests*', 'testing*')),
-    install_requires=['pip', 'wheel', 'pymonkey>=0.2.0'],
+    install_requires=['pip', 'wheel', 'pymonkey>=0.2.2'],
     entry_points={
         'console_scripts': [
             'pip-custom-platform = pip_custom_platform.main:main',
