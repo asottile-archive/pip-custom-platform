@@ -44,6 +44,10 @@ the command line.
 
 `pip-custom-platform install --platform my-platform --download . my-package`
 
+(or with sufficiently new pip)
+
+`pip-custom-platform download --platform my-platform --dest . my-package`
+
 ### Installing packages
 
 `pip-custom-platform install --platform my-platform my-package`
