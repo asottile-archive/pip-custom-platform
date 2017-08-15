@@ -11,9 +11,7 @@ from testing.util import expected_wheel_name
 
 
 def call_coverage(*cmd):
-    subprocess.check_call(
-        (sys.executable, '-m', 'coverage', 'run', '-p') + cmd
-    )
+    subprocess.check_call((sys.executable, '-m', 'coverage', 'run') + cmd)
 
 
 def call(*cmd):
