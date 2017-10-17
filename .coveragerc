@@ -5,7 +5,6 @@ parallel = True
 omit =
     .tox/*
     /usr/*
-    */tmp*
     setup.py
 
 [report]
