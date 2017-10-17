@@ -11,6 +11,6 @@ def pymonkey_patch(mod, args):
     if mod.__name__ == 'distutils.util':
         from pip_custom_platform.default_platform import get_platform_func
         mod.get_platform = get_platform_func(args, mod.get_platform)
-    elif mod.__name__ == 'pip':
+    elif mod.__name__ in ('pip', 'pip._internal') and hasattr(mod, 'main'):
         from pip_custom_platform._main import get_main
         mod.main = get_main(mod.main)

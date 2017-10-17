@@ -11,7 +11,10 @@ import shutil
 import sys
 import tempfile
 
-from pip.commands import get_summaries
+try:  # pragma: no cover (pip>=10)
+    from pip._internal.commands import get_summaries
+except ImportError:  # pragma: no cover (pip<10)
+    from pip.commands import get_summaries
 
 
 @contextlib.contextmanager

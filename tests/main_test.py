@@ -77,9 +77,9 @@ def test_download_smoke(tmpdir):
     wheel('plat1', findlinks_dir, 'testing/project_with_c')
 
     call(
-        'install',
+        'download',
         '--platform', 'plat1',
-        '--download', download_dest,
+        '--dest', download_dest,
         '--find-links', 'file://{}'.format(findlinks_dir),
         '--no-index',
         'project_with_c',
@@ -97,8 +97,8 @@ def test_default_platform(tmpdir):
     call('wheel', '--wheel-dir', findlinks_dir, 'testing/project_with_c')
 
     call(
-        'install',
-        '--download', download_dest,
+        'download',
+        '--dest', download_dest,
         '--find-links', 'file://{}'.format(findlinks_dir),
         '--no-index',
         'project_with_c',
@@ -120,9 +120,9 @@ def test_download_falls_back_to_sdist(tmpdir):
     )
 
     call(
-        'install',
+        'download',
         '--platform', 'plat1',
-        '--download', download_dest,
+        '--dest', download_dest,
         '--find-links', 'file://{}'.format(findlinks_dir),
         '--no-index',
         'project_with_c',
@@ -145,9 +145,9 @@ def test_download_wrong_plat_falls_back_to_sdist(tmpdir):
     wheel('plat2', findlinks_dir, 'testing/project_with_c')
 
     call(
-        'install',
+        'download',
         '--platform', 'plat1',
-        '--download', download_dest,
+        '--dest', download_dest,
         '--find-links', 'file://{}'.format(findlinks_dir),
         '--no-index',
         'project_with_c',
