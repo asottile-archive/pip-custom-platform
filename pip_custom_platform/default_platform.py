@@ -4,6 +4,8 @@ from __future__ import unicode_literals
 import platform
 import re
 
+import distro
+
 
 def _sanitize_platform(platform_name):
     """Platform names must only be alphanumeric with underscores"""
@@ -27,19 +29,16 @@ def _default_platform_name(distutils_util_get_platform):
         return '.'.join(string.split('.')[:num])
 
     if platform.system() == 'Linux':
-        dist, version, __ = platform.linux_distribution()
+        dist, version = distro.id(), distro.version()
         dist = re.sub('linux$', '', dist.lower()).strip()
-
-        if dist == 'red hat enterprise linux server':
-            dist = 'rhel'
 
         # Try to determine a good "release" name. This is highly dependent on
         # distribution and what guarantees they provide between versions.
         release = None
 
-        if dist in ['debian', 'rhel', 'centos', 'fedora', 'opensuse']:
+        if dist in {'debian', 'rhel', 'centos', 'fedora', 'opensuse'}:
             release = grab_version(version, 1)  # one version component
-        elif dist in ['ubuntu']:
+        elif dist in {'ubuntu'}:
             release = grab_version(version, 2)  # two version components
 
         if release:

@@ -26,12 +26,14 @@ SETUP_DEBIAN = (
 )
 SETUP_NO_PIP_PACKAGE = (
     # for systems with no pip system package (or RHEL which wants $$$$)
-    'curl "https://bootstrap.pypa.io/get-pip.py" | python >&2',
+    'curl https://asottile.github.io/get-virtualenv.py | python - venv >&2',
+    '. venv/bin/activate',
 )
 
 SystemTestCase = collections.namedtuple('SystemTestCase', (
     'docker_image',
-    'mock_linux_dist',
+    'mock_id',
+    'mock_version',
     'expected_platform_name',
     'setup_script',
 ))
@@ -39,37 +41,43 @@ SystemTestCase = collections.namedtuple('SystemTestCase', (
 SYSTEM_TESTCASES = [
     SystemTestCase(
         docker_image='ubuntu:trusty',
-        mock_linux_dist=('Ubuntu', '14.04', 'trusty'),
+        mock_id='ubuntu',
+        mock_version='14.04',
         expected_platform_name='linux_ubuntu_14_04_x86_64',
         setup_script=SETUP_DEBIAN,
     ),
     SystemTestCase(
         docker_image='debian:jessie',
-        mock_linux_dist=('debian', '8.1', ''),
+        mock_id='debian',
+        mock_version='8',
         expected_platform_name='linux_debian_8_x86_64',
         setup_script=SETUP_DEBIAN,
     ),
     SystemTestCase(
         docker_image='centos:centos7',
-        mock_linux_dist=('CentOS Linux', '7.1.1503', 'Core'),
+        mock_id='centos',
+        mock_version='7',
         expected_platform_name='linux_centos_7_x86_64',
         setup_script=SETUP_NO_PIP_PACKAGE,
     ),
     SystemTestCase(
         docker_image='fedora:22',
-        mock_linux_dist=('Fedora', '22', 'Twenty Two'),
+        mock_id='fedora',
+        mock_version='22',
         expected_platform_name='linux_fedora_22_x86_64',
         setup_script=('yum install -y python-pip >&2',),
     ),
     SystemTestCase(
-        docker_image='rhel7',
-        mock_linux_dist=('Red Hat Enterprise Linux Server', '7.1', 'Maipo'),
+        docker_image='richxsl/rhel7',
+        mock_id='rhel',
+        mock_version='7.0',
         expected_platform_name='linux_rhel_7_x86_64',
         setup_script=SETUP_NO_PIP_PACKAGE,
     ),
     SystemTestCase(
         docker_image='opensuse:13.2',
-        mock_linux_dist=('openSUSE ', '13.2', 'x86_64'),
+        mock_id='opensuse',
+        mock_version='13.2',
         expected_platform_name='linux_opensuse_13_x86_64',
         setup_script=(
             'zypper --non-interactive install python python-pip >&2',
@@ -77,7 +85,8 @@ SYSTEM_TESTCASES = [
     ),
     SystemTestCase(
         docker_image='base/archlinux',
-        mock_linux_dist=('arch', '', ''),
+        mock_id='arch',
+        mock_version='',
         expected_platform_name='linux_x86_64',
         setup_script=(
             'pacman -Syy >&2',
@@ -89,10 +98,12 @@ SYSTEM_TESTCASES = [
 
 @pytest.mark.parametrize('case', SYSTEM_TESTCASES)
 @mock.patch('pip_custom_platform.default_platform.platform')
-def test_platform_linux(mock_platform, case):
+@mock.patch('pip_custom_platform.default_platform.distro')
+def test_platform_linux(mock_distro, mock_platform, case):
+    mock_distro.id.return_value = case.mock_id
+    mock_distro.version.return_value = case.mock_version
     mock_platform.system.return_value = 'Linux'
     mock_platform.machine.return_value = 'x86_64'
-    mock_platform.linux_distribution.return_value = case.mock_linux_dist
     assert default_platform_name() == case.expected_platform_name
 
 
@@ -126,7 +137,7 @@ class TestDistributionNameDockerIntegration(object):  # pragma: no cover
     def test_platform_name(self, case):
         """Ensure the default_platform_name() output matches what we expect."""
         commands = case.setup_script + (
-            'pip install /mnt >&2',
+            'python -m pip install /mnt >&2',
             'python -c "{}"'.format(PLATFORM_SCRIPT)
         )
         stdout = run_in_docker(case.docker_image, commands)
@@ -134,12 +145,17 @@ class TestDistributionNameDockerIntegration(object):  # pragma: no cover
 
     @pytest.mark.parametrize('case', SYSTEM_TESTCASES)
     def test_mock_is_accurate(self, case):
-        """Ensure our mocks for platform.linux_distribution() are accurate."""
+        """Ensure our mocks for distro are accurate."""
         commands = case.setup_script + (
-            'python -c "import platform\nprint(platform.linux_distribution())"',  # noqa
+            'python -m pip install distro >&2',
+            'python -c "'
+            'import distro\n'
+            'print(distro.id())\n'
+            'print(distro.version())\n'
+            '"',
         )
         stdout = run_in_docker(case.docker_image, commands)
-        assert stdout.strip() == str(case.mock_linux_dist)
+        assert stdout == '\n'.join((case.mock_id, case.mock_version, ''))
 
 
 def run_in_docker(image, commands):  # pragma: no cover

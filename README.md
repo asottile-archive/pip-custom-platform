@@ -15,7 +15,7 @@ created equal).
 ## Default platform names
 
 By default, pip-custom-platform guesses a platform name for you based on the
-`platform` module for Linux, and uses the default platform name on Windows, OS
+`distro` module for Linux, and uses the default platform name on Windows, OS
 X, or other systems. Some examples:
 
 | Platform                | Default Platform Name      |
