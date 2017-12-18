@@ -8,7 +8,7 @@ setup(
         'name for building, downloading, and installing wheels.'
     ),
     url='https://github.com/asottile/pip-custom-platform',
-    version='0.3.1',
+    version='0.3.2',
     author='Anthony Sottile',
     author_email='asottile@umich.edu',
     classifiers=[
