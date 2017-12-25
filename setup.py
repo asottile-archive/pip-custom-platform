@@ -22,7 +22,7 @@ setup(
         'Programming Language :: Python :: Implementation :: PyPy',
     ],
     packages=find_packages(exclude=('tests*', 'testing*')),
-    install_requires=['pip', 'wheel', 'pymonkey>=0.2.2'],
+    install_requires=['distro>=1.2.0', 'pip', 'wheel', 'pymonkey>=0.2.2'],
     entry_points={
         'console_scripts': [
             'pip-custom-platform = pip_custom_platform.main:main',
