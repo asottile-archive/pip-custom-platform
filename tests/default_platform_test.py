@@ -131,7 +131,6 @@ class TestDistributionNameDockerIntegration(object):  # pragma: no cover
     These tests are slow and take up a lot of disk space. They are only run if
     `--docker` is passed to pytest on the command line.
     """
-    # pylint: disable=no-self-use
 
     @pytest.mark.parametrize('case', SYSTEM_TESTCASES)
     def test_platform_name(self, case):
