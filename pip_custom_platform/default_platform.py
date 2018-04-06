@@ -38,7 +38,7 @@ def _default_platform_name(distutils_util_get_platform):
 
         if dist in {'debian', 'rhel', 'centos', 'fedora', 'opensuse'}:
             release = grab_version(version, 1)  # one version component
-        elif dist in {'ubuntu'}:
+        elif dist in {'ubuntu', 'amzn'}:
             release = grab_version(version, 2)  # two version components
 
         if release:
