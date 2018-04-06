@@ -68,6 +68,13 @@ SYSTEM_TESTCASES = [
         setup_script=('yum install -y python-pip >&2',),
     ),
     SystemTestCase(
+        docker_image='amazonlinux:2016.09',
+        mock_id='amzn',
+        mock_version='2016.09',
+        expected_platform_name='linux_amzn_2016_09_x86_64',
+        setup_script=('yum install -y python27-pip >&2',),
+    ),
+    SystemTestCase(
         docker_image='richxsl/rhel7',
         mock_id='rhel',
         mock_version='7.0',
