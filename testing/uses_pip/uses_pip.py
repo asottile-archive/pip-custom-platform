@@ -1,3 +1,4 @@
+import os
 import sys
 
 try:  # pragma: no cover (pip>=10)
@@ -9,6 +10,7 @@ except ImportError:  # pragma: no cover (pip<10)
 def main():
     findlinks, download_dest, pkg, pkgname = sys.argv[1:]
     assert not pip_main(['wheel', pkg, '--wheel-dir', findlinks])
+    os.environ.pop('PIP_REQ_TRACKER', None)  # not reentrant
     assert not pip_main([
         'download',
         '--dest', download_dest,
