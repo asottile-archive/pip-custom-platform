@@ -1,7 +1,6 @@
 -e .
 -e testing/uses_pip
 coverage
-flake8
 mock
 pre-commit
 pytest

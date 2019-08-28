@@ -11,10 +11,16 @@ import shutil
 import sys
 import tempfile
 
-try:  # pragma: no cover (pip>=10)
-    from pip._internal.commands import get_summaries
-except ImportError:  # pragma: no cover (pip<10)
-    from pip.commands import get_summaries
+try:  # pragma: no cover (pip>=19.3)
+    from pip._internal.commands import commands_dict
+
+    def get_summaries():
+        return ((k, v.summary) for k, v in commands_dict.items())
+except ImportError:  # pragma: no cover (pip<19.3)
+    try:  # pragma: no cover (pip>=10)
+        from pip._internal.commands import get_summaries
+    except ImportError:  # pragma: no cover (pip<10)
+        from pip.commands import get_summaries
 
 
 @contextlib.contextmanager
