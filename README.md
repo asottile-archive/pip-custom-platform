@@ -1,5 +1,5 @@
-[![Build Status](https://travis-ci.org/asottile/pip-custom-platform.svg?branch=master)](https://travis-ci.org/asottile/pip-custom-platform)
-[![Coverage Status](https://img.shields.io/coveralls/asottile/pip-custom-platform.svg?branch=master)](https://coveralls.io/r/asottile/pip-custom-platform)
+[![Build Status](https://dev.azure.com/asottile/asottile/_apis/build/status/asottile.pip-custom-platform?branchName=master)](https://dev.azure.com/asottile/asottile/_build/latest?definitionId=60&branchName=master)
+[![Azure DevOps coverage](https://img.shields.io/azure-devops/coverage/asottile/asottile/60/master.svg)](https://dev.azure.com/asottile/asottile/_build/latest?definitionId=60&branchName=master)
 
 pip-custom-platform
 ===================
