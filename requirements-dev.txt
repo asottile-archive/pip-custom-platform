@@ -2,5 +2,7 @@
 -e testing/uses_pip
 coverage
 mock
+# pip-custom-platform currently does not work with pip>=19.3
+pip<19.3
 pre-commit
 pytest

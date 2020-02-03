@@ -10,6 +10,9 @@ matrix:
             python: 3.6
         -   env: TOXENV=pypy
             python: pypy
+    allow_failures:
+    -   env: TOXENV=latest_pip
+        python: 3.6
 install: pip install coveralls tox
 script: tox
 after_success:
