@@ -100,6 +100,15 @@ SYSTEM_TESTCASES = [
             'pacman -S --noconfirm python python-pip >&2',
         )
     ),
+    SystemTestCase(
+        docker_image='alpine:3.11',
+        mock_id='alpine',
+        mock_version='3.11.5',
+        expected_platform_name='linux_alpine_3_11_x86_64',
+        setup_script=(
+            'apk add --no-cache py-pip',
+        )
+    ),
 ]
 
 
