@@ -6,3 +6,5 @@ mock
 pip<19.3
 pre-commit
 pytest
+# pypy's wheel tag changed in pip 20 / wheel 34
+wheel<0.34
