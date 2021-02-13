@@ -2,8 +2,9 @@
 -e testing/uses_pip
 coverage
 mock
-# pip-custom-platform currently does not work with pip>=19.3
-pip<19.3
+pip
+pre-commit
 pytest
+tox
 # pypy's wheel tag changed in pip 20 / wheel 34
 wheel<0.34

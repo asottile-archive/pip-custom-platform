@@ -59,3 +59,22 @@ def get_platform_func(args, distutils_util_get_platform):
     else:
         platform_name = _default_platform_name(distutils_util_get_platform)
     return lambda: platform_name
+
+
+def get_multiple_platforms_func(args, underlying_function):
+    """
+    In pip>20, the underlying function's return type changed from a string, to
+    an iterable. As such, we need to match this when we perform the monkey
+    patch.
+
+    :type args: argparse.Namespace
+    :type underlying_function: Callable[[], Iterator[str]]
+    """
+    def wrapped():
+        for item in map(
+            lambda x: get_platform_func(args, lambda: x)(),
+            underlying_function(),
+        ):
+            yield item
+
+    return wrapped
