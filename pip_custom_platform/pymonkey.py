@@ -53,10 +53,10 @@ def _patch_pip_get_platform(module, args):
     function_name = PEP425_MODULES[module.__name__]
     try:
         underlying_function = getattr(module, function_name)
-    except AttributeError:
+    except AttributeError:  # pragma: no cover
         return
 
-    if isinstance(underlying_function(), str):
+    if isinstance(underlying_function(), str):  # pragma: no cover
         from pip_custom_platform.default_platform import get_platform_func
         shimmed_function = get_platform_func
     else:
@@ -70,6 +70,6 @@ def _patch_pip_get_platform(module, args):
         shimmed_function(args, underlying_function),
     )
 
-    if hasattr(module, 'supported_tags'):
+    if hasattr(module, 'supported_tags'):   # pragma: no cover
         module.supported_tags = module.get_supported()
         module.supported_tags_noarch = module.get_supported(noarch=True)
