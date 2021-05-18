@@ -1,3 +1,12 @@
+# DEPRECATED
+
+this is deprecated without replacement.  perhaps encourage pip to implement
+[pypa/pip#5453]
+
+[pypa/pip#5453]: https://github.com/pypa/pip/issues/5453
+
+___
+
 [![Build Status](https://dev.azure.com/asottile/asottile/_apis/build/status/asottile.pip-custom-platform?branchName=master)](https://dev.azure.com/asottile/asottile/_build/latest?definitionId=60&branchName=master)
 [![Azure DevOps coverage](https://img.shields.io/azure-devops/coverage/asottile/asottile/60/master.svg)](https://dev.azure.com/asottile/asottile/_build/latest?definitionId=60&branchName=master)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/asottile/pip-custom-platform/master.svg)](https://results.pre-commit.ci/latest/github/asottile/pip-custom-platform/master)
